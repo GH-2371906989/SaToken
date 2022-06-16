@@ -4,6 +4,9 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
+import com.gu.satokenitem.common.json.BaseController;
+import com.gu.satokenitem.common.response.Result;
+import com.gu.satokenitem.pojo.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -11,20 +14,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("user")
+@RequestMapping("jotter")
 @Slf4j
 @Api(tags = {"用户接口"})
-public class UserController {
+public class UserController  extends BaseController {
 
-    @PostMapping("doLogin")
+    @PostMapping("/doLogin")
     @ApiOperation("登录")
-    public String doLogin(String username, String password) {
+    public Result doLogin(@RequestBody User user) {
+        System.out.println(user);
         // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
-        if("zhang".equals(username) && "123456".equals(password)) {
+        if("guhuan".equals(user.getUser()) && "123456".equals(user.getPassword())) {
             StpUtil.login(10001);
-            return "登录成功";
+            return success().Message("登录成功").put("Token",StpUtil.getTokenValue());
         }
-        return "登录失败";
+        return error();
     }
 
 

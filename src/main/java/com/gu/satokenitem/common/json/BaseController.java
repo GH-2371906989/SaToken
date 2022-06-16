@@ -12,4 +12,8 @@ public class BaseController {
         return Result.error();
     }
 
+    protected Result result(Integer code,String message) {
+        return new Result(code,message);
+    }
+
 }

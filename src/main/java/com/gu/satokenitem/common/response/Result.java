@@ -45,10 +45,19 @@ public class Result {
         this.message = message;
     }
 
+    public  Result end(){
+        return this;
+    }
+
     public  Result put(String key,Object value){
         this.data.put(key, value);
         return this;
     }
+    public  Result Message(String message){
+        this.message = message;
+        return this;
+    }
+
     public static Result success() {
         return new Result(StatusCode.SUCCESS.getCode(), "success");
     }
