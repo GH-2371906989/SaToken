@@ -1,5 +1,8 @@
 package com.gu.satokenitem.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gu.satokenitem.File.FileUtil;
 import com.gu.satokenitem.common.json.BaseController;
@@ -34,6 +37,7 @@ public class JotterController extends BaseController {
 
     @ApiOperation("获取笔记列表")
     @GetMapping("/getJotters")
+    @SaCheckLogin
     public Result getJotterList(){
         return success().put("JotterList",getJotters());
     }
@@ -45,18 +49,18 @@ public class JotterController extends BaseController {
     }
     @ApiOperation("文件上传到服务器")
     @PostMapping("/uploadService")
-    public List<Jotter> uploadService(@RequestParam("file") MultipartFile file, FileData fileData ) throws IOException, JSchException {
+    public Result uploadService(@RequestParam("file") MultipartFile file, FileData fileData ) throws IOException, JSchException {
         //上传文件的文件名
         String name = file.getOriginalFilename();
         String type = name.substring(name.lastIndexOf(".")+1);
 
         if (fileData.getFilename()==null || fileData.getFilename().trim().equals("")){
             log.info("数据库文件名为空");
-            return getJotters();
+            return error().put("JotterList",getJotters()).Message("保存文件名为null");
         }
         if(!type.trim().equals("pdf") && !type.trim().equals("html")){
             log.info("格式不是pdf或html");
-            return getJotters();
+            return error().put("JotterList",getJotters()).Message("文件格式不是PDF或者HTML");
         }
 
         //上传到那个文件夹下
@@ -91,8 +95,6 @@ public class JotterController extends BaseController {
             build.setDownloadURL(URL);
         }else if (type.trim().equals("html")){
             build.setURL(URL);
-        }else {
-            return getJotters();
         }
 
         //保存到服务器
@@ -111,10 +113,12 @@ public class JotterController extends BaseController {
         }
 //        fileUtil.upload(uploadpath,fileData.getFilename().trim(),);
         fileUtil.closeFtp();
-        return getJotters();
+        return success().put("JotterList",getJotters()).Message("添加数据成功");
     }
+
     @ApiOperation("删除文件")
     @GetMapping("/delectJotters/{id}")
+    @SaCheckPermission(value = {"admin"})
     public List<Jotter> delectfile(@PathVariable("id") int id) throws IOException, JSchException, SftpException {
         QueryWrapper<Jotter> wrapper = new QueryWrapper<>();
         wrapper.eq("id", id);

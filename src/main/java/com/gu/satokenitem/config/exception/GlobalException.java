@@ -5,6 +5,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import com.gu.satokenitem.common.util.AjaxJson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  * 全局异常处理
  */
 @ControllerAdvice
+@Slf4j
 public class GlobalException {
 
     // 全局异常拦截（拦截项目中的所有异常）
@@ -36,17 +38,22 @@ public class GlobalException {
         else if(e instanceof NotRoleException) {		// 如果是角色异常
             NotRoleException ee = (NotRoleException) e;
             aj = AjaxJson.getNotJur("无此角色：" + ee.getRole());
+            log.info("无此角色：" + ee.getRole());
+
         }
         else if(e instanceof NotPermissionException) {	// 如果是权限异常
             NotPermissionException ee = (NotPermissionException) e;
             aj = AjaxJson.getNotJur("无此权限：" + ee.getPermission());
+            log.info("无此权限：" + ee.getPermission());
         }
         else if(e instanceof DisableLoginException) {	// 如果是被封禁异常
             DisableLoginException ee = (DisableLoginException) e;
             aj = AjaxJson.getNotJur("账号被封禁：" + ee.getDisableTime() + "秒后解封");
+            log.info("账号被封禁：" + ee.getDisableTime());
         }
         else {	// 普通异常, 输出：500 + 异常信息
             aj = AjaxJson.getError(e.getMessage());
+            log.info("普通异常：" + e.getMessage());
         }
 
         // 返回给前端
