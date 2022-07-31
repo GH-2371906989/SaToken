@@ -8,18 +8,39 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.web.client.RestTemplate;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.concurrent.ScheduledFuture;
 
 @SpringBootTest
 class SatokenitemApplicationTests {
     @Autowired
     RestTemplate restTemplate;
+//    @Autowired
+//    TaskScheduler taskScheduler;
     @Test
     void t1() {
-        String t1 = "hello t1";
-        HttpEntity<String> stringHttpEntity = new HttpEntity<>(t1);
-        ResponseEntity<String> forEntity = restTemplate.postForEntity("http://localhost:7778/rest/r1", stringHttpEntity, String.class);
-        String body = forEntity.getBody();
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.initialize();
+        taskScheduler.setPoolSize(2);
+        ScheduledFuture scheduledFuture = taskScheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("vhengg");
+            }
+        }, new CronTrigger("0/1 * * * * ?"));
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
